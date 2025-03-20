@@ -1,0 +1,5 @@
+{
+    "name" : "ChartLegend View",
+    "version" : "1.1",
+  "dependencies": [ "Points", "Cluster" ]
+}
