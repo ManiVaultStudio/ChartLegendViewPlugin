@@ -202,11 +202,26 @@ void ChartLegendViewPlugin::init()
 
     // Update data when data set changed
     //connect(&_settingsAction.getPositionSettingsHolder().getPositionDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, &ChartLegendViewPlugin::convertPointDataAndUpdateChart);
-    connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, &ChartLegendViewPlugin::updateChart);
+
+   const auto colorDatasetChange = [this]() -> void
+   {
+       auto currentDataset = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset();
+       if (currentDataset.isValid())
+       {
+           connect(&currentDataset, &Dataset<DatasetImpl>::dataChanged, this, &ChartLegendViewPlugin::updateChart);
+           connect(&currentDataset, &Dataset<DatasetImpl>::changed, this, &ChartLegendViewPlugin::updateChart);
+           connect(&currentDataset, &Dataset<DatasetImpl>::dataSelectionChanged, this, &ChartLegendViewPlugin::updateChart);
+           
+           updateChart();
+       }
+   };
+   connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, colorDatasetChange);
+
+    //connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, &ChartLegendViewPlugin::updateChart);
     //connect(&_currentDataset, &Dataset<DatasetImpl>::dataChanged, this, &ChartLegendViewPlugin::updateChart);
 
 
-    
+
     getWidget().setLayout(layout);
     const auto projectOpenDone = [this]() -> void
         {
@@ -291,6 +306,7 @@ void ChartLegendViewPlugin::init()
             auto delimiter = _settingsAction.getColorSettingsHolder().getDelimiterString().getString();
             // Split clusterNames by delimiter
             QStringList list = clusterNames.split(delimiter);
+            
             if (!list.isEmpty())
             {
                 // Convert list to QSet to perform intersection
@@ -305,9 +321,10 @@ void ChartLegendViewPlugin::init()
                         common.append(option);
                     }
                 }
-
+                
                 if (!common.isEmpty())
                 {
+                    //qDebug() << "common: " << common;
                     _settingsAction.getColorSettingsHolder().getSelectionStringList().setSelectedOptions(common);
                 }
                 else
@@ -315,6 +332,10 @@ void ChartLegendViewPlugin::init()
                     _settingsAction.getColorSettingsHolder().getSelectionStringList().setSelectedOptions({ "" });
                 }
             }
+        }
+        else
+        {
+            _settingsAction.getColorSettingsHolder().getSelectionStringList().setSelectedOptions({ "" });
         }
     };
 
@@ -357,7 +378,7 @@ void ChartLegendViewPlugin::init()
                     
                     //TODO: emit _chartWidget->getCommunicationObject().qt_js_setPointDataColor(full);
 
-                        qDebug() << "sending color: ";
+                        //qDebug() << "sending color: ";
                         updateChart();
 
 
@@ -608,6 +629,16 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
     layout->setContentsMargins(0, 0, 0, 0);
 
     int itemHeight = 30;
+    QStringList selectionStrings = _settingsAction.getColorSettingsHolder().getSelectionStringList().getSelectedOptions();
+    QColor colorSelection = _settingsAction.getColorSettingsHolder().getSelectionColorAction().getColor();
+    //qDebug() << "Selection Strings:" << selectionStrings;
+    //qDebug() << "Selection Color:" << colorSelection;
+
+    _selectedClusters.clear();
+    for (const QString& name : selectionStrings) {
+        _selectedClusters.insert(name);
+    }
+
     for (const QVariant& clusterItem : clusters) {
         QVariantMap cluster = clusterItem.toMap();
         QString name = cluster["name"].toString();
@@ -629,7 +660,11 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
 
         // Add the text label
         QLabel* textLabel = new QLabel(QString("%1 (%2)").arg(name).arg(count), legendRow);
-        textLabel->setStyleSheet("font-size: 12px; color: black;");  // Set text color to black
+        if (selectionStrings.contains(name)) {
+            textLabel->setStyleSheet(QString("color: %1; font-size: 13px;").arg(colorSelection.name()));
+        } else {
+            textLabel->setStyleSheet("font-size: 12px; color: black;");
+        }
 
         // Add the color box and label to the row
         rowLayout->addWidget(colorBox);
@@ -637,16 +672,6 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
 
         // Add the legend row to the frame layout
         layout->addWidget(legendRow);
-        QStringList selectionStrings = _settingsAction.getColorSettingsHolder().getSelectionStringList().getSelectedOptions();
-        _selectedClusters.clear();
-        for (const QString& name : selectionStrings) {
-            _selectedClusters.insert(name);
-        }
-        if (selectionStrings.contains(name)) {
-            _selectedClusters.insert(name);
-            QColor colorSelection = _settingsAction.getColorSettingsHolder().getSelectionColorAction().getColor();
-            textLabel->setStyleSheet(QString("color: %1; font-size: 13px;").arg(colorSelection.name()));
-        }
     }
 
     layout->addStretch();
@@ -772,11 +797,11 @@ void ChartLegendViewPlugin::updateChart()
 
             auto data = mv::data().getDataset<Clusters>(_settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset()->getId());
             auto clusters = data->getClusters();
-
+            auto options = _settingsAction.getColorSettingsHolder().getSelectionStringList().getSelectedOptions();
             auto clusterNames = data->getClusterNames();
             QStringList stringList = convertToQStringList(clusterNames);
             _settingsAction.getColorSettingsHolder().getSelectionStringList().setOptions(stringList);
-            _settingsAction.getColorSettingsHolder().getSelectionStringList().setSelectedOptions({ "" });
+            _settingsAction.getColorSettingsHolder().getSelectionStringList().setSelectedOptions(options);
             convertClusterDataAndUpdateChart();
         }  
         else
