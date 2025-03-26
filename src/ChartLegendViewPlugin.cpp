@@ -536,7 +536,9 @@ void ChartLegendViewPlugin::createNumericalChart(QVariantList chartDataNumerical
     QScrollArea* scrollArea = new QScrollArea(_legendWidget);
     scrollArea->setWidgetResizable(true);
     scrollArea->setFrameStyle(QFrame::NoFrame);  // Remove the border
-
+    // Hide scrollbars but keep scroll functionality
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     // Create a container widget for the numerical chart
     QWidget* containerWidget = new QWidget();
     containerWidget->setStyleSheet("border: none;");  // Ensure no border
@@ -619,6 +621,9 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
     scrollArea->setWidgetResizable(true);
     scrollArea->setFrameStyle(QFrame::NoFrame);
     scrollArea->setContentsMargins(0, 0, 0, 0);
+    // Hide scrollbars but keep scroll functionality
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Create a container widget for the legend rows
     QWidget* containerWidget = new QWidget();
@@ -662,7 +667,8 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
         QLabel* textLabel = new QLabel(QString("%1 (%2)").arg(name).arg(count), legendRow);
         if (selectionStrings.contains(name)) {
             textLabel->setStyleSheet(QString("color: %1; font-size: 13px;").arg(colorSelection.name()));
-        } else {
+        }
+        else {
             textLabel->setStyleSheet("font-size: 12px; color: black;");
         }
 
