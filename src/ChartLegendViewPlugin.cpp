@@ -72,7 +72,7 @@ QColor selectColorVal(double value, double min, double max, const QString& color
         {"PuOr", {QColor(45, 0, 75), QColor(84, 39, 136), QColor(128, 115, 172), QColor(178, 171, 210), QColor(216, 218, 235), QColor(247, 247, 247), QColor(254, 224, 182), QColor(253, 184, 99), QColor(224, 130, 20), QColor(179, 88, 6), QColor(127, 59, 8)}}, // Inversed Purple-Orange
         {"BuPu", {QColor(237, 248, 251), QColor(191, 211, 230), QColor(158, 188, 218), QColor(140, 150, 198), QColor(140, 107, 177), QColor(136, 65, 157), QColor(129, 15, 124), QColor(77, 0, 75)}}, // Blue-Purple
         {"Reds", {QColor(255, 245, 240), QColor(254, 224, 210), QColor(252, 187, 161), QColor(252, 146, 114), QColor(251, 106, 74), QColor(239, 59, 44), QColor(203, 24, 29), QColor(153, 0, 13), QColor(103, 0, 13)}}, // Reds
-        {"Viridis", {QColor(68, 1, 84), QColor(72, 35, 116), QColor(59, 82, 139), QColor(44, 114, 142), QColor(33, 144, 141), QColor(39, 173, 129), QColor(92, 200, 99), QColor(200, 220, 50), QColor(255, 255, 0)}}, // Viridis
+        {"Viridis", {QColor(255, 255, 0), QColor(200, 220, 50), QColor(92, 200, 99), QColor(39, 173, 129), QColor(33, 144, 141), QColor(44, 114, 142), QColor(59, 82, 139), QColor(72, 35, 116), QColor(68, 1, 84)}}, // Reversed Viridis
         {"Q_BlGrRd", {QColor(5, 48, 97), QColor(33, 102, 172), QColor(67, 147, 195), QColor(146, 197, 222), QColor(209, 229, 240), QColor(247, 247, 247), QColor(253, 219, 199), QColor(244, 165, 130), QColor(202, 0, 32), QColor(165, 0, 38)}}, // Custom Blue-Green-Red
         {"Magma", {QColor(0, 0, 4), QColor(28, 16, 68), QColor(79, 18, 123), QColor(129, 37, 129), QColor(181, 54, 122), QColor(229, 80, 100), QColor(251, 135, 97), QColor(254, 194, 135), QColor(252, 253, 191)}}, // Magma
        {"PiYG", {QColor(77, 172, 38), QColor(184, 225, 134), QColor(230, 245, 208), QColor(247, 247, 247), QColor(253, 224, 239), QColor(241, 182, 218), QColor(208, 28, 139)}}, // Inversed Pink-Yellow-Green
@@ -536,7 +536,9 @@ void ChartLegendViewPlugin::createNumericalChart(QVariantList chartDataNumerical
     QScrollArea* scrollArea = new QScrollArea(_legendWidget);
     scrollArea->setWidgetResizable(true);
     scrollArea->setFrameStyle(QFrame::NoFrame);  // Remove the border
-
+    // Hide scrollbars but keep scroll functionality
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     // Create a container widget for the numerical chart
     QWidget* containerWidget = new QWidget();
     containerWidget->setStyleSheet("border: none;");  // Ensure no border
@@ -619,6 +621,9 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
     scrollArea->setWidgetResizable(true);
     scrollArea->setFrameStyle(QFrame::NoFrame);
     scrollArea->setContentsMargins(0, 0, 0, 0);
+    // Hide scrollbars but keep scroll functionality
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Create a container widget for the legend rows
     QWidget* containerWidget = new QWidget();
@@ -662,7 +667,8 @@ void ChartLegendViewPlugin::createCategoricalChart(QVariantList chartDataCategor
         QLabel* textLabel = new QLabel(QString("%1 (%2)").arg(name).arg(count), legendRow);
         if (selectionStrings.contains(name)) {
             textLabel->setStyleSheet(QString("color: %1; font-size: 13px;").arg(colorSelection.name()));
-        } else {
+        }
+        else {
             textLabel->setStyleSheet("font-size: 12px; color: black;");
         }
 
