@@ -74,11 +74,11 @@ private:
     HorizontalToolbarAction _horizontalToolbarAction;
 
 protected:
-    DropWidget*                  _dropWidget;                /** Widget for drag and drop behavior */
-    SettingsAction               _settingsAction;
-    QFrame*                      _legendWidget;
-    QSet<QString>                _selectedClusters;
-    mv::Dataset<mv::DatasetImpl> _currentDataset;
+    DropWidget*             _dropWidget;                /** Widget for drag and drop behavior */
+    SettingsAction            _settingsAction;
+    QFrame*                   _legendWidget;
+    QSet<QString>        _selectedClusters;
+    mv::Dataset<mv::DatasetImpl>          _currentDataset;
 };
 
 /**
