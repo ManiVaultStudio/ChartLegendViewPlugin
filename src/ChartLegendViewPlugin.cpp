@@ -1,6 +1,7 @@
 #include "ChartLegendViewPlugin.h"
 
 #include <event/Event.h>
+#include <util/Serialization.h>
 
 #include <DatasetsMimeData.h>
 
