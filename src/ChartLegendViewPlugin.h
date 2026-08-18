@@ -78,7 +78,7 @@ protected:
     SettingsAction            _settingsAction;
     QFrame*                   _legendWidget;
     QSet<QString>        _selectedClusters;
-    Dataset<DatasetImpl>          _currentDataset;
+    mv::Dataset<mv::DatasetImpl>          _currentDataset;
 };
 
 /**
