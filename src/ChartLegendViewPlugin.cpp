@@ -204,19 +204,13 @@ void ChartLegendViewPlugin::init()
     // Update data when data set changed
     //connect(&_settingsAction.getPositionSettingsHolder().getPositionDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, &ChartLegendViewPlugin::convertPointDataAndUpdateChart);
 
-   const auto colorDatasetChange = [this]() -> void
-   {
-       auto currentDataset = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset();
-       if (currentDataset.isValid())
-       {
-           connect(&currentDataset, &Dataset<DatasetImpl>::dataChanged, this, &ChartLegendViewPlugin::updateChart);
-           connect(&currentDataset, &Dataset<DatasetImpl>::changed, this, &ChartLegendViewPlugin::updateChart);
-           connect(&currentDataset, &Dataset<DatasetImpl>::dataSelectionChanged, this, &ChartLegendViewPlugin::updateChart);
-           
+   connect(&_currentDataset, &Dataset<DatasetImpl>::dataChanged, this, &ChartLegendViewPlugin::updateChart);
+   connect(&_currentDataset, &Dataset<DatasetImpl>::dataSelectionChanged, this, &ChartLegendViewPlugin::updateChart);
+   connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentDatasetChanged,
+       this, [this](const Dataset<DatasetImpl>& dataset) {
+           _currentDataset = dataset;
            updateChart();
-       }
-   };
-   connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, colorDatasetChange);
+       });
 
     //connect(&_settingsAction.getColorSettingsHolder().getColorDatasetAction(), &DatasetPickerAction::currentIndexChanged, this, &ChartLegendViewPlugin::updateChart);
     //connect(&_currentDataset, &Dataset<DatasetImpl>::dataChanged, this, &ChartLegendViewPlugin::updateChart);
@@ -353,40 +347,11 @@ void ChartLegendViewPlugin::init()
         };
     connect(&_settingsAction.getColorSettingsHolder().getDelimiterString(), &StringAction::stringChanged, this, delimiterStringSelection);
 
-    const auto colorMapActionSelection = [this]() -> void
-        {
-            if(_settingsAction.getColorSettingsHolder().getColorMapAction().getColorMap()!="" && _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset().isValid())
-            {
-                const auto& mirrorAction = _settingsAction.getColorSettingsHolder().getColorMapAction().getMirrorAction(ColorMapAction::Axis::X);
-                QString s1 = _settingsAction.getColorSettingsHolder().getColorMapAction().getColorMap();
-                QString s2 = "*%*";
-                QString s3;
-                if (mirrorAction.isChecked())
-                {
-                    s3 = "T";
-                }
-                else
-                {
-                    s3 = "F";
-                }
-
-                if (_settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset().isValid() && s1 != "")
-                {
-                    QVariantMap colorMap;
-                    colorMap.insert("color", s1);
-                    colorMap.insert("mirror", s3);
-                    QVariantList full = QVariantList{ colorMap };
-                    
-                    //TODO: emit _chartWidget->getCommunicationObject().qt_js_setPointDataColor(full);
-
-                        //qDebug() << "sending color: ";
-                        updateChart();
-
-
-                }
-
-            }
-        };
+    const auto colorMapActionSelection = [this]() {
+        auto& colors = _settingsAction.getColorSettingsHolder();
+        if (!colors.getColorMapAction().getColorMap().isEmpty())
+            updateChart();
+    };
     connect(&_settingsAction.getColorSettingsHolder().getColorMapAction(), &ColorMap1DAction::imageChanged, this, colorMapActionSelection);
 
     const auto dimSelectionStringSelection = [this]() -> void
@@ -709,8 +674,8 @@ QColor ChartLegendViewPlugin::selectColor(double value, double min, double max) 
 
 void ChartLegendViewPlugin::convertPointDataAndUpdateChart()
 {
-    auto currentPointDataset = mv::data().getDataset<Points>(_settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset()->getId());
-    if (!currentPointDataset.isValid() && currentPointDataset->getDataType() !=PointType)
+    auto currentPointDataset = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset<Points>();
+    if (!currentPointDataset.isValid())
     {
 
         clearChartFrame();
@@ -772,13 +737,14 @@ void ChartLegendViewPlugin::convertPointDataAndUpdateChart()
 }
 void ChartLegendViewPlugin::updateChart()
 {
-    auto type = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset()->getDataType();
-    if (!_settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset().isValid())
+    const auto dataset = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset();
+    if (!dataset.isValid())
     {
         clearChartFrame();
         return;
 }
 
+    const auto type = dataset->getDataType();
     if (type==PointType || type ==ClusterType)
     {
         if (type == PointType)
@@ -825,8 +791,8 @@ void ChartLegendViewPlugin::updateChart()
 void ChartLegendViewPlugin::convertClusterDataAndUpdateChart()
 {
 
-    auto currentClusterDataset = mv::data().getDataset<Clusters>(_settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset()->getId());
-    if (!currentClusterDataset.isValid() && currentClusterDataset->getDataType() != ClusterType)
+    auto currentClusterDataset = _settingsAction.getColorSettingsHolder().getColorDatasetAction().getCurrentDataset<Clusters>();
+    if (!currentClusterDataset.isValid())
     {
 
         clearChartFrame();
