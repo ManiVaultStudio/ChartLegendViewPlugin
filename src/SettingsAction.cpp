@@ -1,4 +1,4 @@
-﻿#include "SettingsAction.h"
+#include "SettingsAction.h"
 
 #include <iostream>
 #include <set>
@@ -101,7 +101,12 @@ void SettingsAction::fromVariantMap(const QVariantMap& variantMap)
 {
     WidgetAction::fromVariantMap(variantMap);
 
-    _colorSettingsHolder.getColorDatasetAction().fromParentVariantMap(variantMap);
+    auto& picker = _colorSettingsHolder.getColorDatasetAction();
+    const auto savedDataset = variantMap.value(picker.getSerializationName()).toMap();
+    if (!savedDataset.isEmpty()) {
+        picker.mv::gui::WidgetAction::fromVariantMap(savedDataset);
+        picker.setCurrentDataset(savedDataset.value(QStringLiteral("Value")).toString());
+    }
     _colorSettingsHolder.getDimensionSelectionAction().fromParentVariantMap(variantMap);
     _colorSettingsHolder.getColorMapAction().fromParentVariantMap(variantMap);
     _colorSettingsHolder.getClusterSelectionString().fromParentVariantMap(variantMap);
