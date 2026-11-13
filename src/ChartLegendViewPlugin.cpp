@@ -856,9 +856,9 @@ void ChartLegendViewPlugin::publishClusterSelection(const std::vector<unsigned i
 
 ChartLegendViewPluginFactory::ChartLegendViewPluginFactory()
 {
-    setIconByName("list");
-    getPluginMetadata().setDescription("ChartLegend view plugin");
-    getPluginMetadata().setSummary("This chartLegend shows how to implement a basic view plugin in ManiVault Studio.");
+    setIconByName("palette");
+    getPluginMetadata().setDescription("Legend for cluster colors and numeric scales.");
+    getPluginMetadata().setSummary("See what the scatterplot colors represent and highlight selected entries.");
     getPluginMetadata().setCopyrightHolder({ "BioVault (Biomedical Visual Analytics Unit LUMC - TU Delft)" });
     getPluginMetadata().setAuthors({
         { "A. Vieth", { "Plugin developer", "Maintainer" }, { "LUMC", "TU Delft" } },
