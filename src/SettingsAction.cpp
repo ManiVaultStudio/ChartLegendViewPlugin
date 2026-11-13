@@ -1,3 +1,4 @@
+#include "QtTooltipKit.h"
 #include "SettingsAction.h"
 
 #include <iostream>
@@ -39,17 +40,20 @@ SettingsAction::SettingsAction(ChartLegendViewPlugin& ChartLegendViewPlugin, mv:
     _colorSettingsHolder.getChartTitleAction().setSerializationName("Legend:ChartTitle");
 
 
-    _colorSettingsHolder.getColorDatasetAction().setToolTip("ColorDataset");
-    _colorSettingsHolder.getDimensionSelectionAction().setToolTip("DimensionSelection");
-    _colorSettingsHolder.getClusterSelectionString().setToolTip("ClusterSelectionString");
-    _colorSettingsHolder.getDimSelectionString().setToolTip("DimSelectionString");
-    _colorSettingsHolder.getSelectionColorAction().setToolTip("SelectionColorAction");
-    _colorSettingsHolder.getSelectionStringList().setToolTip("SelectionStringList");
-    _colorSettingsHolder.getColorMapAction().setToolTip("Colormap");
-    _colorSettingsHolder.getDelimiterString().setToolTip("Delimiter");
+    _colorSettingsHolder.getColorDatasetAction().setIconByName("palette");
+    qttooltipkit::set(_colorSettingsHolder.getColorDatasetAction(), tr("Color dataset"), tr("Choose the clusters or numeric values shown in the legend. In a linked view this follows the scatterplot."));
+    qttooltipkit::set(_colorSettingsHolder.getDimensionSelectionAction(), tr("Numeric dimension"), tr("Choose which numeric field the legend displays."));
+    qttooltipkit::set(_colorSettingsHolder.getClusterSelectionString(), tr("Selected cluster names"), tr("Names of clusters to highlight in the legend."));
+    qttooltipkit::set(_colorSettingsHolder.getDimSelectionString(), tr("Selected dimensions"), tr("Names of numeric dimensions to highlight."));
+    _colorSettingsHolder.getSelectionColorAction().setIconByName("highlighter");
+    qttooltipkit::set(_colorSettingsHolder.getSelectionColorAction(), tr("Selection highlight"), tr("Marks selected legend entries. In a linked workspace, this follows the scatterplot selection color."));
+    qttooltipkit::set(_colorSettingsHolder.getSelectionStringList(), tr("Legend entries"), tr("Choose which entries are highlighted."));
+    _colorSettingsHolder.getColorMapAction().setIconByName("palette");
+    qttooltipkit::set(_colorSettingsHolder.getColorMapAction(), tr("Numeric color scale"), tr("Choose the gradient used to represent numeric values in the legend."));
+    qttooltipkit::set(_colorSettingsHolder.getDelimiterString(), tr("Name separator"), tr("Separate multiple names in the linked selection text."));
     _colorSettingsHolder.getDelimiterString().setString(",");
-    _colorSettingsHolder.getConstantColorAction().setToolTip("ConstantColorAction");
-    _colorSettingsHolder.getChartTitleAction().setToolTip("ChartTitle");
+    qttooltipkit::set(_colorSettingsHolder.getConstantColorAction(), tr("Fallback color"), tr("Color used when an entry has no color from the dataset."));
+    qttooltipkit::set(_colorSettingsHolder.getChartTitleAction(), tr("Legend title"), tr("Heading shown above the legend."));
     _colorSettingsHolder.getChartTitleAction().setString("Chart Title");
 
 
